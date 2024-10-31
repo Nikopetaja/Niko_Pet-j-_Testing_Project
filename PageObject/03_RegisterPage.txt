@@ -1,0 +1,69 @@
+#******************** Settings ************************
+
+*** Settings ***
+
+# Documentation for the user registration testsuite
+
+Documentation    User Registration Test scenario with verification of valid and invalid credentials for new user account creation.
+
+# Preconditions and Postconditions for the test cases
+
+Pre Condition    Open Browser, navigate to the registration page
+Post Condition   Close Browser
+Tags             Registration, TS-2-Register
+
+#******************* Common Variables ********************
+
+*** Variables ***
+
+# NOTE: Please Remove your login credential before uploading Assignments
+
+# Registration page and field variables
+
+RegisterUrl      https://gitlab.com/users/sign_up
+Valid_Username   TestUser123
+Valid_Password   ValidPassword!123
+Valid_Email      testuser123@example.com
+Invalid_Email    user#example.com
+Short_Password   pass
+Empty           
+
+#******************** Test Cases *************************
+
+*** Test Cases ***
+
+# Positive Tests
+
+Register User With Valid Details
+    Navigate To Registration Page   RegisterUrl
+    Input Username                  Valid_Username
+    Input Password                  Valid_Password
+    Input Email                     Valid_Email
+    Submit Registration Form
+    Verify Page Should Contain      "Welcome to GitLab, {username}!"
+
+# Negative Tests
+
+Register User With Duplicate Username
+    Navigate To Registration Page   RegisterUrl
+    Input Username                  Valid_Username  # This should be a username already in use
+    Input Password                  Valid_Password
+    Input Email                     anotheremail@example.com
+    Submit Registration Form
+    Verify Page Should Contain      "Username is already taken."
+
+Register User With Empty Password
+    Navigate To Registration Page   RegisterUrl
+    Input Username                  "NewUser456"
+    Input Password                  Empty
+    Input Email                     newuser456@example.com
+    Submit Registration Form
+    Verify Page Should Contain      "Minimum lenght is 8 characters."  
+
+Register User With Invalid Email
+    Navigate To Registration Page   RegisterUrl
+    Input Username                  "NewUser789"
+    Input Password                  Valid_Password
+    Input Email                     Invalid_Email
+    Submit Registration Form
+    Verify Page Should Contain      "Please provide a valid email address."

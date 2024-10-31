@@ -1,0 +1,73 @@
+#******************** Settings ************************
+
+*** Settings ***
+
+# Documentation for the project testsuite
+
+Documentation    Project CRUD Operation Testing: This includes creating, reading, updating, and deleting projects.
+
+# Preconditions and Postconditions for the test cases
+
+Pre Condition    Open Browser, navigate to the GitLab project page
+Post Condition   Close Browser, verify all created projects are deleted
+Tags             Project, CRUD, TS-3-Project
+
+#******************* Common Variables ********************
+
+*** Variables ***
+
+# Project creation page URL and test field variables
+
+ProjectUrl               https://gitlab.com/projects/new
+ProjectName              "TestProject123"
+TemplateProjectName      "TemplateProject123"
+UpdatedProjectName       "UpdatedTemplateProject123"
+ExistingProjectName      "DuplicateTestProject"
+
+#******************** Test Cases *************************
+
+*** Test Cases ***
+
+# Positive Tests
+
+Create Blank Project
+    Navigate To Project Creation Page   ProjectUrl
+    Select Blank Project Template
+	Input Project Name                  ProjectName
+    Submit Project Form
+    Verify Page Should Contain          "Project 'TestProject123' was successfully created."
+
+Create Template Project
+    Navigate To Project Creation Page   ProjectUrl
+    Select Template Project Option
+	Input Project Name                  TemplateProjectName
+    Submit Project Form
+    Verify Page Should Contain          "The project was successfully imported."
+
+Update Name of Template Project
+    Navigate To Project Settings Page   https://gitlab.com/TemplateProject123/edit 
+    Update Project Name                 UpdatedProjectName
+    Save Changes
+    Verify Page Should Contain          "Project 'UpdatedTemplateProject123' was successfully updated."
+
+Delete Template Project
+    Navigate To Project Settings Page   https://gitlab.com/TemplateProject123/edit
+    Confirm Delete Project
+    Verify Page Should Contain			"Project 'MyGroup-agafgpaodfg / UpdatedTemplateProject123-deleted-63128172' will be deleted on 2024-11-07"
+
+# Negative Tests
+
+Create Blank Project With Duplicate Name
+    Navigate To Project Creation Page   ProjectUrl
+    Select Blank Project Template
+	Input Project Name                  ExistingProjectName   # Use a name already in us
+    Submit Project Form
+    Verify Page Should Contain          "Project namespace name has already been taken,
+											Name has already been taken,
+											Path has already been taken"
+
+Create Project Without Project Name
+    Navigate To Project Creation Page   ProjectUrl
+    Leave Project Name Empty
+    Submit Project Form
+    Verify Page Should Contain          "Please fill out this field."

@@ -1,0 +1,58 @@
+#******************** Settings ************************
+
+*** Settings ***
+
+Documentation    Issue CRUD Operation Testing: Creating, reading, updating, and deleting issues in an existing project.
+
+# Preconditions and Postconditions for the test cases
+
+Pre Condition    Project must be created by the user before beginning the issue tests
+Post Condition   All created issues should be deleted
+Tags             Issue, CRUD, TS-4-Issue
+
+#******************* Common Variables ********************
+
+*** Variables ***
+
+# Issue management URL and test field variables
+
+ProjectUrl                   https://gitlab.com/group-slug-here/project-slug-here/-/issues
+FirstIssueName               "InitialIssue"
+UpdatedIssueName             "UpdatedIssueName"
+SecondIssueName              "UpdatedIssueName"   # Using updated name to check duplicate handling
+IssueDescription             "This is a test issue created for CRUD operations."
+
+#******************** Test Cases *************************
+
+*** Test Cases ***
+
+# Positive Tests
+
+Create Issue
+    Navigate To Project Issues Page    ProjectUrl
+    Click On "New Issue"
+    Input Issue Title                  FirstIssueName
+    Input Issue Description            IssueDescription
+    Submit Issue Form
+    Verify Page Should Contain         "InitialIssue#1 · created just now by FirstName LastName"
+
+Update Name of Issue
+    Navigate To Issue Details Page     ProjectUrl/1
+    Click On "Edit Issue"
+    Update Issue Title                 UpdatedIssueName
+    Submit Changes
+    Verify Page Should Contain         "FirstName LastName changed title from InitialIssue to UpdatedIssueName just now"
+
+Create Second Issue With Previous Updated Name
+    Navigate To Project Issues Page    ProjectUrl
+    Click On "New Issue"
+    Input Issue Title                  SecondIssueName
+    Input Issue Description            "Testing duplicate issue title handling."
+    Submit Issue Form
+    Verify Page Should Contain         "UpdatedIssueName#2 · created just now by FirstName LastName"
+
+Delete First Issue
+    Navigate To Issue Details Page     ProjectUrl/1   # Use the actual issue ID in place of "1"
+    Click On "Delete Issue"
+    Confirm Deletion
+    Verify Page Should Contain			"The issue was successfully deleted."
